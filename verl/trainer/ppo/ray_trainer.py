@@ -553,7 +553,7 @@ class RayPPOTrainer(object):
         replacement = rf"\1{prediction}\2"
         return re.sub(pattern, replacement, orig_prompt, flags=re.IGNORECASE)
     
-    def _apply_hindsight_relabeling(self, batch: DataProto) -> DataProto:
+    def _apply_hindsight_relabeling(self, batch: DataProto):
         from verl.utils.reward_score.countdown import extract_solution, validate_equation, evaluate_equation
         
         for i in range(len(batch)):
