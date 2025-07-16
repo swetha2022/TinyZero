@@ -557,7 +557,7 @@ class RayPPOTrainer(object):
         from verl.utils.reward_score.countdown import extract_solution, validate_equation, evaluate_equation
         
         for i in range(len(batch)):
-            if random.random() > self.relabel_fraction and batch.non_tensor_batch['data_source'][i] == 'countdown':
+            if batch.non_tensor_batch['data_source'][i] != 'countdown' or random.random() > self.relabel_fraction:
                 continue
 
             response_ids = batch.batch['responses'][i]
