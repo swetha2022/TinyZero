@@ -68,6 +68,9 @@ class GCRewardManager():
             ground_truth = data_item.non_tensor_batch['reward_model']['ground_truth']
 
             data_source = data_item.non_tensor_batch['data_source']
+
+            assert data_source == "countdown"
+
             compute_score_fn = _select_rm_score_fn(data_source)
 
             # set format score to 0 for GC 1/0 reward (no partial rewards)

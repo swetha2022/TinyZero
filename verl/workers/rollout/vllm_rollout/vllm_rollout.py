@@ -203,9 +203,9 @@ class vLLMRollout(BaseRollout):
         # attention_mask: [0,0,0,0,1,1,1,1, | 1,1,1,0,0,0,0,0]
         # position_ids:   [0,0,0,0,0,1,2,3, | 4,5,6,7,8,9,10,11]
         response_position_ids = position_ids[:, -1:] + delta_position_id
-        position_ids = torch.cat([position_ids, response_position_ids], dim=-1)
+        new_position_ids = torch.cat([position_ids, response_position_ids], dim=-1)
         response_attention_mask = get_eos_mask(response_id=response, eos_token=eos_token_id, dtype=attention_mask.dtype)
-        attention_mask = torch.cat((attention_mask, response_attention_mask), dim=-1)
+        new_attention_mask = torch.cat((attention_mask, response_attention_mask), dim=-1)
 
         # all the tp ranks should contain the same data here. data in all ranks are valid
         batch = TensorDict(
@@ -214,8 +214,10 @@ class vLLMRollout(BaseRollout):
                 'responses': response,
                 'input_ids': seq,  # here input_ids become the whole sentences
                 # 'old_log_probs': log_probs, # we will recompute old log prob with actor
-                'attention_mask': attention_mask,
-                'position_ids': position_ids
+                'attention_mask': new_attention_mask,
+                'response_attention_mask': response_attention_mask,
+                'position_ids': new_position_ids,
+                'response_position_ids': response_position_ids
             },
             batch_size=batch_size)
 
