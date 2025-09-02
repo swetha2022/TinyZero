@@ -561,6 +561,7 @@ class RayPPOTrainer(object):
     
     def _apply_hindsight_relabeling(self, batch: DataProto):
         from verl.utils.reward_score.countdown import extract_solution, validate_equation, evaluate_equation
+        torch.autograd.set_detect_anomaly(True)
 
         for i in range(len(batch)):
             if batch.non_tensor_batch['data_source'][i] != 'countdown' or random.random() > self.relabel_fraction:
@@ -597,7 +598,8 @@ class RayPPOTrainer(object):
                 continue 
 
             batch.non_tensor_batch['reward_model'][i]['ground_truth']["target"] = prediction
-            orig_prompt = self.tokenizer.decode(prompt_ids)
+            non_pad_ids = prompt_ids[prompt_ids != self.tokenizer.pad_token_id]    
+            orig_prompt = self.tokenizer.decode(non_pad_ids)
             relabeled_prompt = self._relabel_prompt(orig_prompt, prediction)
 
             new_prompt_ids, new_attention_mask = verl_F.tokenize_and_postprocess_data(prompt=relabeled_prompt,
